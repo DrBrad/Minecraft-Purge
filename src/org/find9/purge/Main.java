@@ -93,6 +93,7 @@ public class Main extends JavaPlugin {
 
                 long now = new Date().getTime();
                 if(now-start > getPeriodicTime()){
+                    start = now;
                     ArrayList<MyGroup> groups = getListOfGroups();
                     if(groups != null){
                         for(MyGroup group : groups){
