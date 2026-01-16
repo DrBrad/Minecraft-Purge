@@ -4,7 +4,7 @@
     <root id="archive" name="Purge.jar">
       <element id="module-output" name="Purge" />
       <element id="extracted-dir" path="$PROJECT_DIR$/libs/json-20230227.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$USER_HOME$/build tools/Spigot/Spigot-API/target/spigot-api-1.21.11-R0.1-SNAPSHOT.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/build tools/spigot-api-1.21.11-R0.2-SNAPSHOT.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

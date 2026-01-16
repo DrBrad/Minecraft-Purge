@@ -132,7 +132,7 @@ public class GroupCommands implements CommandExecutor, TabExecutor {
                         return getFlags((Player) commandSender);
 
                     case "version":
-                        commandSender.sendMessage("§7MyEconomy version §c"+plugin.getDescription().getVersion()+"§7 by DrBrad.");
+                        commandSender.sendMessage("§7Purge version §c"+plugin.getDescription().getVersion()+"§7 by DrBrad.");
                         return true;
                 }
 
