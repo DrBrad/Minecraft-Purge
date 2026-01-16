@@ -13,9 +13,12 @@ import org.find9.purge.group.GroupHandler;
 import org.find9.purge.group.MyGroup;
 import org.find9.purge.handlers.PlayerCooldown;
 import org.find9.purge.handlers.PlayerResolver;
+import org.find9.purge.handlers.TimeRemaining;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAdjusters;
 
 import static org.find9.purge.Config.*;
 import static org.find9.purge.group.GroupHandler.getPlayersGroup;
@@ -109,5 +112,29 @@ public class Main extends JavaPlugin {
 
     public static boolean isPurge(){
         return ZonedDateTime.now().getDayOfWeek() == DayOfWeek.SUNDAY;
+    }
+
+    public static TimeRemaining timeUntilPurge(){
+        ZonedDateTime now = ZonedDateTime.now();
+
+        ZonedDateTime nextSunday = now
+                .with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+                .toLocalDate()
+                .atStartOfDay(now.getZone());
+
+        if(now.isAfter(nextSunday)){
+            nextSunday = nextSunday.plusWeeks(1);
+        }
+
+        Duration d = Duration.between(now, nextSunday);
+
+        long totalSeconds = d.getSeconds();
+
+        long days = totalSeconds / 86_400;
+        long hours = (totalSeconds % 86_400) / 3_600;
+        long minutes = (totalSeconds % 3_600) / 60;
+        long seconds = totalSeconds % 60;
+
+        return new TimeRemaining(days, hours, minutes, seconds);
     }
 }

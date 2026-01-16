@@ -29,14 +29,12 @@ public class Config {
             createPower = 20,
             joinPower = 20,
             claimCost = 1,
-            createWarpCost = 5,
-            maxShops = 6;
+            createWarpCost = 5;
 
     private static boolean backTeleport = true,
             homeTeleport = true,
             groupHome = true,
-            groupWarp = true,
-            shops = true;
+            groupWarp = true;
 
     public Config(){
         if(!plugin.getDataFolder().exists()){
@@ -91,9 +89,6 @@ public class Config {
                 config.set("group.home", true);
                 config.set("group.warp", true);
                 config.set("group.ranks", new String[]{ "Member", "Recruit", "Admin", "Owner" });
-
-                config.set("shop.enabled", true);
-                config.set("shop.max-per-player", 6);
 
                 config.save(configFile);
             }
@@ -155,14 +150,6 @@ public class Config {
 
     public static String[] getRanks(){
         return ranks;
-    }
-
-    public static boolean isShops(){
-        return shops;
-    }
-
-    public static int getMaxShops(){
-        return maxShops;
     }
 
     public static void setSpawn(Location location){

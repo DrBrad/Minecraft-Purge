@@ -11,19 +11,22 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.find9.purge.claim.Claim;
 import org.find9.purge.claim.Flags;
 import org.find9.purge.group.MyGroup;
 import org.find9.purge.group.Zone;
+import org.find9.purge.handlers.TimeRemaining;
 
+import java.time.DayOfWeek;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.List;
 
 import static org.find9.purge.Config.*;
-import static org.find9.purge.Main.isPurge;
-import static org.find9.purge.Main.plugin;
+import static org.find9.purge.Main.*;
 import static org.find9.purge.claim.ClaimHandler.*;
 import static org.find9.purge.group.GroupHandler.*;
 import static org.find9.purge.handlers.BlockHandler.*;
@@ -39,6 +42,17 @@ public class MyEventHandler implements Listener {
 
     private static Map<Player, UUID> enteredClaim = new HashMap<>();
     private Random random = new Random();
+
+    @EventHandler
+    public void onServerListPing(ServerListPingEvent event){
+        if(isPurge()){
+            event.setMotd("§7The §6Purge§7 is commencing!");
+            return;
+        }
+
+        TimeRemaining t = timeUntilPurge();
+        event.setMotd("§7The §6Purge§7 starts in: §a"+t.days+"§7 days §a"+t.hours+"§7 hours §a"+t.minutes+"§7 minutes §a"+t.seconds+"§7 seconds.");
+    }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event){
