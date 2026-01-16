@@ -92,8 +92,6 @@ public class Main extends JavaPlugin {
                 stopMapping(player);
             }
         }
-
-        clearEntities();
     }
 
     private void createRecipes(){

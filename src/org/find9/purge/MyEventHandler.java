@@ -58,8 +58,6 @@ public class MyEventHandler implements Listener {
         }
 
         setPlayerCooldown(event.getPlayer().getUniqueId());
-
-        checkDistanceEntities(event.getPlayer(), event.getPlayer().getLocation());
     }
 
     @EventHandler
@@ -83,8 +81,6 @@ public class MyEventHandler implements Listener {
         setPlayerCooldown(event.getPlayer().getUniqueId());
 
         removePlayerAFK(event.getPlayer());
-
-        stopRenderingEntities(event.getPlayer());
     }
 
     @EventHandler
@@ -104,8 +100,6 @@ public class MyEventHandler implements Listener {
         }else{
             spawnCircle(event.getPlayer(), event.getTo(), Color.fromRGB(0, 0, 255));
         }
-
-        checkDistanceEntities(event.getPlayer(), event.getPlayer().getLocation());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -705,7 +699,6 @@ public class MyEventHandler implements Listener {
         }
 
         setPlayerAFK(event.getPlayer());
-        checkDistanceEntities(event.getPlayer(), event.getPlayer().getLocation());
     }
 
     /*

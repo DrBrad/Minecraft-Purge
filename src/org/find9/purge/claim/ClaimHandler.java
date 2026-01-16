@@ -3,8 +3,6 @@ package org.find9.purge.claim;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
-import org.dynmap.markers.AreaMarker;
-import org.dynmap.markers.MarkerSet;
 import org.find9.purge.group.Group;
 import org.find9.purge.group.MyGroup;
 import org.find9.purge.group.Zone;
@@ -12,10 +10,7 @@ import org.find9.purge.group.Zone;
 import java.io.*;
 import java.util.*;
 
-import static org.bukkit.Bukkit.getServer;
 import static org.find9.purge.Config.getClaimCost;
-import static org.find9.purge.Main.dynmap;
-import static org.find9.purge.handlers.Colors.getColorRGB;
 import static org.find9.purge.handlers.MapHandler.*;
 import static org.find9.purge.Main.plugin;
 import static org.find9.purge.group.GroupHandler.*;
@@ -24,9 +19,7 @@ public class ClaimHandler {
 
     private static Map<String, Claim> claims = new HashMap<>();
     //private static JSONObject claims = new JSONObject();
-    private static Map<String, AreaMarker> markers = new HashMap<>();
     private static Map<UUID, AutoClaim> autoClaiming = new HashMap<>();
-    private static MarkerSet markerSet;
 
     public ClaimHandler(){
         if(plugin.getDataFolder().exists()){
@@ -59,70 +52,8 @@ public class ClaimHandler {
                         claims.put(key, new Claim(uuid, type, flags));
                     }
                 }
-
-                if(dynmap != null){
-                    initDynmap();
-                }
             }catch(Exception e){
                 e.printStackTrace();
-            }
-        }
-    }
-
-    private void initDynmap(){
-        markerSet = dynmap.getMarkerAPI().getMarkerSet("myeconomy");
-        if(markerSet == null){
-            markerSet = dynmap.getMarkerAPI().createMarkerSet("myeconomy", "claims", null, false);
-        }
-
-        System.out.println("Loading markers into Dynmap!");
-
-        for(String key : claims.keySet()){
-            String[] tokens = key.split("\\|");
-
-            Chunk chunk = getServer().getWorld(tokens[0]).getChunkAt(Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]));
-            String worldName = chunk.getWorld().getName();
-            double[] xPoints = { chunk.getX()*16, (chunk.getX()*16)+16, (chunk.getX()*16)+16, chunk.getX()*16 };
-            double[] zPoints = { chunk.getZ()*16, chunk.getZ()*16, (chunk.getZ()*16)+16, (chunk.getZ()*16)+16 };
-            UUID uuid = claims.get(key).getKey();
-
-            if(claims.get(key).getType() > 0){
-                Zone zone = getZoneByUUID(uuid);
-
-                if(zone != null){
-                    AreaMarker areaMarker = markerSet.createAreaMarker(
-                            "myeconomy|"+key,
-                            zone.getName(),
-                            false,
-                            worldName,
-                            xPoints,
-                            zPoints,
-                            false
-                    );
-
-                    areaMarker.setLineStyle(1, 1.0, getColorRGB(zone.getColor()).asRGB());
-                    areaMarker.setFillStyle(0.5, getColorRGB(zone.getColor()).asRGB());
-                    markers.put(key, areaMarker);
-                }
-
-            }else{
-                MyGroup group = getGroupFromUUID(uuid);
-
-                if(group != null){
-                    AreaMarker areaMarker = markerSet.createAreaMarker(
-                            "myeconomy|"+key,
-                            group.getName(),
-                            false,
-                            worldName,
-                            xPoints,
-                            zPoints,
-                            false
-                    );
-
-                    areaMarker.setLineStyle(1, 1.0, getColorRGB(group.getColor()).asRGB());
-                    areaMarker.setFillStyle(0.5, getColorRGB(group.getColor()).asRGB());
-                    markers.put(key, areaMarker);
-                }
             }
         }
     }
@@ -137,35 +68,6 @@ public class ClaimHandler {
                         removeMappedChunk(player.getUniqueId(), chunk);
                         mapLandscape(player, chunk);
                     }
-
-                    if(dynmap != null){
-                        markerSet = dynmap.getMarkerAPI().getMarkerSet("myeconomy");
-                        if(markerSet == null){
-                            markerSet = dynmap.getMarkerAPI().createMarkerSet("myeconomy", "claims", null, false);
-                        }
-
-                        AreaMarker marker = markers.remove(key);
-                        if(marker != null){
-                            marker.deleteMarker();
-                        }
-
-                        double[] xPoints = { chunk.getX()*16, (chunk.getX()*16)+16, (chunk.getX()*16)+16, chunk.getX()*16 };
-                        double[] zPoints = { chunk.getZ()*16, chunk.getZ()*16, (chunk.getZ()*16)+16, (chunk.getZ()*16)+16 };
-
-                        AreaMarker areaMarker = markerSet.createAreaMarker(
-                                "myeconomy|"+key,
-                                group.getName(),
-                                false,
-                                chunk.getWorld().getName(),
-                                xPoints,
-                                zPoints,
-                                false
-                        );
-
-                        areaMarker.setLineStyle(1, 1.0, getColorRGB(group.getColor()).asRGB());
-                        areaMarker.setFillStyle(0.5, getColorRGB(group.getColor()).asRGB());
-                        markers.put(key, areaMarker);
-                    }
                     return true;
                 }
 
@@ -174,35 +76,6 @@ public class ClaimHandler {
                     if(isMapping(player.getUniqueId())){
                         removeMappedChunk(player.getUniqueId(), chunk);
                         mapLandscape(player, chunk);
-                    }
-
-                    if(dynmap != null){
-                        markerSet = dynmap.getMarkerAPI().getMarkerSet("myeconomy");
-                        if(markerSet == null){
-                            markerSet = dynmap.getMarkerAPI().createMarkerSet("myeconomy", "claims", null, false);
-                        }
-
-                        AreaMarker marker = markers.remove(key);
-                        if(marker != null){
-                            marker.deleteMarker();
-                        }
-
-                        double[] xPoints = { chunk.getX()*16, (chunk.getX()*16)+16, (chunk.getX()*16)+16, chunk.getX()*16 };
-                        double[] zPoints = { chunk.getZ()*16, chunk.getZ()*16, (chunk.getZ()*16)+16, (chunk.getZ()*16)+16 };
-
-                        AreaMarker areaMarker = markerSet.createAreaMarker(
-                                "myeconomy|"+key,
-                                group.getName(),
-                                false,
-                                chunk.getWorld().getName(),
-                                xPoints,
-                                zPoints,
-                                false
-                        );
-
-                        areaMarker.setLineStyle(1, 1.0, getColorRGB(group.getColor()).asRGB());
-                        areaMarker.setFillStyle(0.5, getColorRGB(group.getColor()).asRGB());
-                        markers.put(key, areaMarker);
                     }
                     return true;
                 }
@@ -395,13 +268,6 @@ public class ClaimHandler {
             for(String key : claims.keySet()){
                 if(claims.get(key).getKey().equals(uuid)){
                     claims.remove(key);
-
-                    if(dynmap != null){
-                        AreaMarker marker = markers.remove(key);
-                        if(marker != null){
-                            marker.deleteMarker();
-                        }
-                    }
                 }
 
                 write();
