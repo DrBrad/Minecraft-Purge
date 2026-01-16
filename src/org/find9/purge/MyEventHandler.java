@@ -543,12 +543,12 @@ public class MyEventHandler implements Listener {
                 }
             }
 
-            if(isPurge()){
-                return;
-            }
-
             if(event.getDamager() instanceof Player){
                 Player attacker = (Player) event.getDamager();
+
+                if(!isPurge()){
+                    return;
+                }
 
                 MyGroup victomsGroup = getPlayersGroup(player.getUniqueId());
                 MyGroup attackerGroup = getPlayersGroup(attacker.getUniqueId());
