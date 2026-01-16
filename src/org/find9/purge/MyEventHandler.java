@@ -588,6 +588,11 @@ public class MyEventHandler implements Listener {
             Player player = (Player) event.getEntity();
             Chunk chunk = player.getLocation().getChunk();
 
+            if(!isPurge()){
+                event.setCancelled(true);
+                return;
+            }
+
             if(inClaim(chunk)){
                 Claim claim = getClaim(chunk);
                 if(claim != null && claim.getType() == 2){

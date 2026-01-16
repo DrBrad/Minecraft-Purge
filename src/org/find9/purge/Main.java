@@ -2,6 +2,7 @@ package org.find9.purge;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
@@ -19,12 +20,17 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.UUID;
 
 import static org.find9.purge.Config.*;
+import static org.find9.purge.group.GroupHandler.getListOfGroups;
 import static org.find9.purge.group.GroupHandler.getPlayersGroup;
 import static org.find9.purge.handlers.Colors.getChatColor;
 import static org.find9.purge.handlers.MapHandler.isMapping;
 import static org.find9.purge.handlers.MapHandler.stopMapping;
+import static org.find9.purge.handlers.PlayerCooldown.getPlayerCooldown;
 
 public class Main extends JavaPlugin {
 
@@ -68,6 +74,8 @@ public class Main extends JavaPlugin {
         createRecipes();
 
         task = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable(){
+            private long start = new Date().getTime();
+
             @Override
             public void run(){
                 String[] names = getRanks();
@@ -80,6 +88,30 @@ public class Main extends JavaPlugin {
 
                     }else{
                         player.setPlayerListName("§6[§7AFK§6]§c"+player.getName());
+                    }
+                }
+
+                long now = new Date().getTime();
+                if(now-start > getPeriodicTime()){
+                    ArrayList<MyGroup> groups = getListOfGroups();
+                    if(groups != null){
+                        for(MyGroup group : groups){
+                            int power = group.getPower();
+                            for(String uuid : group.getPlayers()){
+                                OfflinePlayer player = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+
+                                if(player != null){
+                                    if(player.isOnline()){
+                                        power += getPeriodicIncrease();
+
+                                    }else if(getPeriodicDecreaseCooldown()+getPlayerCooldown(player.getUniqueId()) < now){
+                                        power -= getPeriodicDecrease();
+                                    }
+                                }
+                            }
+
+                            group.setPower(power);
+                        }
                     }
                 }
             }

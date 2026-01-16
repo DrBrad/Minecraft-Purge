@@ -29,6 +29,10 @@ public class Config {
             createPower = 20,
             joinPower = 20,
             claimCost = 1,
+            periodicIncrease = 3,
+            periodicDecrease = 1,
+            periodicDecreaseCooldown = 86400,
+            periodicTime = 1800,
             createWarpCost = 5;
 
     private static boolean backTeleport = true,
@@ -53,6 +57,10 @@ public class Config {
                 createPower = config.getInt("group.create-power");
                 joinPower = config.getInt("group.join-power");
                 claimCost = config.getInt("group.claim-cost");
+                periodicIncrease = config.getInt("group.periodic-power-increase");
+                periodicDecrease = config.getInt("group.periodic-power-decrease");
+                periodicTime = config.getInt("group.periodic-increase-time");
+                periodicDecreaseCooldown = config.getInt("group.periodic-power-decrease-cooldown");
                 createWarpCost = config.getInt("group.create-warp-cost");
                 groupHome = config.getBoolean("group.home");
                 groupWarp = config.getBoolean("group.warp");
@@ -134,6 +142,22 @@ public class Config {
 
     public static int getClaimCost(){
         return claimCost;
+    }
+
+    public static int getPeriodicIncrease(){
+        return periodicIncrease;
+    }
+
+    public static int getPeriodicDecrease(){
+        return periodicDecrease;
+    }
+
+    public static int getPeriodicDecreaseCooldown(){
+        return periodicDecreaseCooldown*1000;
+    }
+
+    public static int getPeriodicTime(){
+        return periodicTime*20;
     }
 
     public static int getCreateWarpCost(){
