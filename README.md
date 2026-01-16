@@ -5,6 +5,19 @@ claim land so that others cant touch it and disable PvP. However once the Purge 
 protections are dropped for 24 hours. During the Purge players can modify claimed land, open
 claimed land chests, and PvP other players.
 
+Important Notes
+-----------
+Claims allow players to take chunks IE 16x16 blocks, which can be seen using the `/g map` command.
+If a chunk is claimed by a group no other group or player can modify that chunk in any way, unless
+of course it's the purge. Each group is given a default of `20 power` on group creation. For each
+player that joins a group the group is given another `20 power` IE if there are 2 players in a group
+the group has a total of `40 power`. When you claim a chunk you spend `1 power` to claim that chunk
+and you can re-obtain that power by unclaiming that chunk. For x time the player plays the server the
+group will gain an extra `x power`.
+
+Ranks allow groups to have a trust system for players which allow certain players in the group to
+modify chunks, claim land, set group homes, etc...
+
 Group Commands
 -----------
 | Command                 | Description                                           |
