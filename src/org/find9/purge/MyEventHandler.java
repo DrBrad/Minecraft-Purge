@@ -547,6 +547,7 @@ public class MyEventHandler implements Listener {
                 Player attacker = (Player) event.getDamager();
 
                 if(!isPurge()){
+                    event.setCancelled(true);
                     return;
                 }
 
@@ -587,11 +588,6 @@ public class MyEventHandler implements Listener {
         if(event.getEntity() instanceof Player){
             Player player = (Player) event.getEntity();
             Chunk chunk = player.getLocation().getChunk();
-
-            if(!isPurge()){
-                event.setCancelled(true);
-                return;
-            }
 
             if(inClaim(chunk)){
                 Claim claim = getClaim(chunk);
