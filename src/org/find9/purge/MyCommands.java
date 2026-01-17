@@ -125,13 +125,6 @@ public class MyCommands implements CommandExecutor, TabExecutor {
                             }
                         }
                         break;
-
-                    case "chunkload":
-                        if(args.length == 1){
-                            tabComplete.add("set");
-                            tabComplete.add("clear");
-                        }
-                        break;
                 }
             }else{
                 tabComplete.add("warps");
@@ -148,7 +141,6 @@ public class MyCommands implements CommandExecutor, TabExecutor {
                 tabComplete.add("msg");
                 tabComplete.add("gamemode");
                 tabComplete.add("back");
-                tabComplete.add("chunkload");
             }
 
             return tabComplete;
