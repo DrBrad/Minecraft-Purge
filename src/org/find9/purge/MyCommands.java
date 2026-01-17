@@ -1,6 +1,7 @@
 package org.find9.purge;
 
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,7 +17,9 @@ import java.util.List;
 
 import static org.find9.purge.Config.*;
 import static org.find9.purge.Main.plugin;
+import static org.find9.purge.claim.ClaimHandler.inClaim;
 import static org.find9.purge.group.GroupHandler.getPlayersGroup;
+import static org.find9.purge.handlers.BlockHandler.getDangerous;
 import static org.find9.purge.handlers.Colors.getColorRGB;
 import static org.find9.purge.handlers.GeneralHandler.*;
 
@@ -71,6 +74,9 @@ public class MyCommands implements CommandExecutor, TabExecutor {
 
                 case "tpa":
                     return tpa(((Player) commandSender), args);
+
+                case "wild":
+                    return wild(((Player) commandSender), 0);
 
                 case "gamemode":
                     return gamemode(((Player) commandSender), args);
@@ -139,6 +145,7 @@ public class MyCommands implements CommandExecutor, TabExecutor {
                 tabComplete.add("tpaa");
                 tabComplete.add("tpad");
                 tabComplete.add("msg");
+                tabComplete.add("wild");
                 tabComplete.add("gamemode");
                 tabComplete.add("back");
             }
@@ -500,6 +507,60 @@ public class MyCommands implements CommandExecutor, TabExecutor {
             player.sendMessage("§cYou don't have permission to perform this command.");
             return true;
         }
+    }
+
+    private boolean wild(Player player, int attempt){
+        if(player.hasPermission("wild")){
+            if(isWildTeleport()){
+                if(!isWildDelayed(player)){
+                    Location location = null;
+                    for(int i = 0; i < 6; i++){
+                        int x = (int) (Math.random()*(getWildRadius()*2))-getWildRadius();
+                        int z = (int) (Math.random()*(getWildRadius()*2))-getWildRadius();
+
+                        location = new Location(player.getWorld(), x, 0, z);
+                        if(!inClaim(location.getChunk())){
+                            break;
+                        }
+                    }
+
+                    if(inClaim(location.getChunk())){
+                        player.sendMessage("§cCouldn't find a location outside a claim, try again.");
+                        return true;
+                    }
+
+                    List<Material> dangerous = getDangerous();
+                    Block block = location.getWorld().getHighestBlockAt(location.getBlockX(), location.getBlockZ());
+
+                    if(dangerous.contains(block.getType()) || block.getY() < 0){
+                        if(attempt > 3){
+                            player.sendMessage("§cCould not find a safe place to teleport, try again.");
+                            return true;
+                        }
+                        return wild(player, attempt+1);
+                    }
+
+                    block = block.getWorld().getBlockAt(block.getX(), block.getY()+1, block.getZ());
+
+                    setWildDelayed(player);
+
+                    MyGroup group = getPlayersGroup(player.getUniqueId());
+                    if(group != null){
+                        teleport(player, block.getLocation(), "Wild", getColorRGB(group.getColor()));
+
+                    }else{
+                        teleport(player, block.getLocation(), "Wild", getColorRGB(5));
+                    }
+                }else{
+                    player.sendMessage("§cYou can only do /wild every "+(getWildDelay()/60000)+" minutes.");
+                }
+            }else{
+                player.sendMessage("§cServer has wild teleports disabled.");
+            }
+        }else{
+            player.sendMessage("§cYou don't have permission to perform this command.");
+        }
+        return true;
     }
 
     private boolean back(Player player){

@@ -196,7 +196,6 @@ public class BlockHandler {
     public static List<Material> getDangerous(){
         Material[] tmp = {
                 Material.LAVA,
-                Material.WATER,
                 Material.MAGMA_BLOCK,
                 Material.CACTUS,
                 Material.FIRE,

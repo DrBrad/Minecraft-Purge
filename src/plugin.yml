@@ -220,6 +220,10 @@ commands:
     description: Message another player in private.
     usage: |
       /msg PLAYER_NAME
+  wild:
+    description: Teleport randomly in the wild to land unclaimed.
+    usage: |
+      /wild
   gamemode:
     description: Change your gamemode
     usage: |
@@ -357,6 +361,9 @@ permissions:
   msg:
     default: true
     description: Message another player in private.
+  wild:
+    default: true
+    description: Teleport randomly in the wild to land unclaimed.
   gamemode:
     default: false
     description: Change your gamemode

@@ -62,6 +62,7 @@ public class Main extends JavaPlugin {
         getCommand("tpaa").setExecutor(new MyCommands());
         getCommand("tpad").setExecutor(new MyCommands());
         getCommand("msg").setExecutor(new MyCommands());
+        getCommand("wild").setExecutor(new MyCommands());
         getCommand("gamemode").setExecutor(new MyCommands());
         getCommand("back").setExecutor(new MyCommands());
 

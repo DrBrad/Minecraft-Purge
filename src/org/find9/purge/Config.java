@@ -9,10 +9,7 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.find9.purge.Main.plugin;
 
@@ -22,10 +19,13 @@ public class Config {
     private static Map<String, Location> warps = new HashMap<>();
     private static Map<Player, Player> playerTeleport = new HashMap<>();
     private static Map<Player, Long> afkList = new HashMap<>();
+    public static HashMap<Player, Long> wildDelayed = new HashMap<>();
 
     private static String[] ranks = { "Member", "Recruit", "Admin", "Owner" };
 
     private static int teleportDelay = 2,
+            wildRadius = 5000,
+            wildDelay = 600,
             createPower = 20,
             joinPower = 20,
             claimCost = 1,
@@ -38,7 +38,8 @@ public class Config {
     private static boolean backTeleport = true,
             homeTeleport = true,
             groupHome = true,
-            groupWarp = true;
+            groupWarp = true,
+            wildTeleport = true;
 
     public Config(){
         if(!plugin.getDataFolder().exists()){
@@ -51,8 +52,11 @@ public class Config {
 
             if(configFile.exists()){
                 teleportDelay = config.getInt("teleportation.delay");
+                wildTeleport = config.getBoolean("teleportation.wild");
                 backTeleport = config.getBoolean("teleportation.back");
                 homeTeleport = config.getBoolean("teleportation.home");
+                wildRadius = config.getInt("teleportation.wild-radius");
+                wildDelay = config.getInt("teleportation.wild-delay");
 
                 createPower = config.getInt("group.create-power");
                 joinPower = config.getInt("group.join-power");
@@ -192,6 +196,31 @@ public class Config {
 
     public static Location getEndSpawn(){
         return endSpawn;
+    }
+
+    public static int getWildRadius(){
+        return wildRadius;
+    }
+
+    public static int getWildDelay(){
+        return wildDelay*1000;
+    }
+
+    public static boolean isWildTeleport(){
+        return wildTeleport;
+    }
+
+    public static void setWildDelayed(Player player){
+        wildDelayed.put(player, new Date().getTime()+getWildDelay());
+    }
+
+    public static boolean isWildDelayed(Player player){
+        if(wildDelayed.containsKey(player)){
+            if(wildDelayed.get(player) > new Date().getTime()){
+                return true;
+            }
+        }
+        return false;
     }
 
     public static Location getWarp(String name){

@@ -79,5 +79,6 @@ Extra Commands
 | /tpad     | Deny teleport for player                                  |
 | /wild     | Teleport to a random location that isn't owned by a group |
 | /msg      | Message a player privatly                                 |
+| /wild     | Teleport randomly in the wild to land unclaimed.          |
 | /gamemode | Better gamemode changing                                  |
 | /back     | Go back to last location teleported                       |
