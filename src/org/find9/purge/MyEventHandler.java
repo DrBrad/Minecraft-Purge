@@ -4,27 +4,33 @@ import org.bukkit.*;
 import org.bukkit.Color;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.*;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.find9.purge.claim.Claim;
 import org.find9.purge.claim.Flags;
 import org.find9.purge.group.MyGroup;
 import org.find9.purge.group.Zone;
 import org.find9.purge.handlers.TimeRemaining;
+import org.find9.purge.handlers.TinyEnderHolder;
 
-import java.time.DayOfWeek;
-import java.time.ZonedDateTime;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
+import static org.bukkit.Bukkit.getLogger;
 import static org.find9.purge.Config.*;
 import static org.find9.purge.Main.*;
 import static org.find9.purge.claim.ClaimHandler.*;
@@ -41,6 +47,7 @@ import static org.find9.purge.handlers.PlayerResolver.*;
 public class MyEventHandler implements Listener {
 
     private static Map<Player, UUID> enteredClaim = new HashMap<>();
+    private final Map<UUID, Inventory> openTiny = new HashMap<>();
     private Random random = new Random();
 
     @EventHandler
@@ -95,6 +102,7 @@ public class MyEventHandler implements Listener {
         setPlayerCooldown(event.getPlayer().getUniqueId());
 
         removePlayerAFK(event.getPlayer());
+        openTiny.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
@@ -219,7 +227,12 @@ public class MyEventHandler implements Listener {
         }
 
         if(event.getAction() == Action.RIGHT_CLICK_BLOCK){
-            if(event.getClickedBlock().getType() == Material.SPAWNER){
+            if(event.getClickedBlock().getType() == Material.ENDER_CHEST){
+                event.setCancelled(true);
+                openTinyEnder(event.getPlayer(), event.getClickedBlock().getLocation());
+                return;
+
+            }else if(event.getClickedBlock().getType() == Material.SPAWNER){
                 Player player = event.getPlayer();
                 Material material = player.getItemInHand().getType();
 
@@ -716,6 +729,25 @@ public class MyEventHandler implements Listener {
         setPlayerAFK(event.getPlayer());
     }
 
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event){
+        UUID uuid = event.getPlayer().getUniqueId();
+
+        Inventory top = event.getView().getTopInventory();
+        Inventory expected = openTiny.get(uuid);
+        if(expected == null){
+            return;
+        }
+
+        if(!top.equals(expected)){
+            return;
+        }
+
+        saveContents(uuid, top.getContents());
+        //expected.getLocation().getWorld().playSound(expected.getLocation(), Sound.BLOCK_ENDER_CHEST_CLOSE, 1.0f, 1.0f);
+        openTiny.remove(uuid);
+    }
+
     /*
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onChunkUnload(ChunkUnloadEvent event){
@@ -747,6 +779,63 @@ public class MyEventHandler implements Listener {
                     }
                 }
             }, random.nextInt(121)+40);
+        }
+    }
+
+    private void openTinyEnder(Player player, Location location){
+        UUID uuid = player.getUniqueId();
+
+        TinyEnderHolder holder = new TinyEnderHolder(uuid);
+
+        Inventory inv = Bukkit.createInventory(holder, InventoryType.HOPPER, "Ender Chest");
+        inv.setContents(loadContents(uuid));
+
+        openTiny.put(uuid, inv);
+        player.openInventory(inv);
+        location.getWorld().playSound(location, Sound.BLOCK_ENDER_CHEST_OPEN, 1.0f, 1.0f);
+    }
+
+    private File playerFile(UUID uuid){
+        return new File(plugin.getDataFolder()+File.separator+"ender", uuid.toString()+".yml");
+    }
+
+    private ItemStack[] loadContents(UUID uuid){
+        ItemStack[] out = new ItemStack[5];
+
+        File f = playerFile(uuid);
+        if(!f.exists()){
+            return out;
+        }
+
+        YamlConfiguration yml = YamlConfiguration.loadConfiguration(f);
+
+        List<?> list = yml.getList("items");
+        if(list == null){
+            return out;
+        }
+
+        for(int i = 0; i < out.length && i < list.size(); i++){
+            Object o = list.get(i);
+
+            if(o instanceof ItemStack item){
+                out[i] = item;
+            }
+        }
+
+        return out;
+    }
+
+    private void saveContents(UUID uuid, ItemStack[] contents){
+        File f = playerFile(uuid);
+        YamlConfiguration yml = new YamlConfiguration();
+
+        yml.set("items", contents);
+
+        try{
+            yml.save(f);
+
+        }catch(IOException e){
+            getLogger().severe("Failed to save tiny ender chest for " + uuid + ": " + e.getMessage());
         }
     }
 }
